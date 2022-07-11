@@ -154,16 +154,51 @@ vector<double> random_surfer_walk(vector<int> adj[], double damping_factor, int 
 }
 
 vector<double> iterate_Meth2(vector<int> adj[], double damping_factor){
-    map<int, double> pagerank;
-    bool converge = false; // Results converge hone ka bool maintain krre
-    int size = sizeof(adj);
-    for(int i=0;i<size;i++) pagerank[i] = 1/size; //Initial probability assignment
-    while(!converge){
 
+    int sz = sizeof(adj); //No. of nodes in graph
+    map<int, double> pagerank; //adjacency list define krte hue
+    //vector<double> ranks; //iske saath work krenge
+    bool converged = false; //p<0.001 ko check krne ke liye
+
+    for(int i=0;i<sz;i++) pagerank[i]= double(1)/double(sz); //Initial probability sabko same derahe
+
+    // is it necessary? me not sure
+    //for(int i=0;i<sz;i++){
+    //    pagerank[i].push_back(i);
+    //    for(auto x:adj[i]) pagerank[i].push_back(x);
+    //}
+    //
+
+    while(!converged){
+        map<int, double> ranks_cpy;
+        for(int i=0;i<sz;i++) ranks_cpy[i] = pagerank[i]; // ranks ko hi copy kiya
+        map<int,double> ranks_diff; //threshold(0.001) maintain/check krne ke liye
+
+        for(int i=0;i<sz;i++){
+            double prb =0; //probability
+            //int l=0; //calculating no. of links from one site to others
+            for(auto x:adj[i]){
+                if(x.size()!=0) prb += ranks_cpy[i]/x.size();
+                else if(x.size==0) prb+= 1/sz;
+            }
+            // Be cautious. CHECK
+            pagerank[i] = double(1-damping_factor)/sz + double(damping_factor*prb);
+            ranks_diff[i] = abs(ranks_cpy[i]-pagerank[i]);
+
+        }
+        converged = true;
+        for(int i=0;i<sz;i++){
+            if(ranks_diff[i]>0.001) converged=false;
+        }
     }
 
+    //Precautionary Step to check sum of probabilities = 1?
+    int sum_prb = 0;
+    for(int i=0;i<sz;i++) sum_prb+=pagerank[i];
+    for(int i=0;i<sz;i++) pagerank[i]=pagerank[i]/sum_prb;
+    //Same hi result dega ye
 
-
+    return pagerank;
 }
 
 int main()
