@@ -153,37 +153,31 @@ vector<double> random_surfer_walk(vector<int> adj[], double damping_factor, int 
   return ranks;
 }
 
-vector<double> iterate_Meth2(vector<int> adj[], double damping_factor){
+map<int, double> iterate_Meth2(vector<int> adj[], double damping_factor, int size1){
 
-    int sz = sizeof(adj); //No. of nodes in graph
+    int sz = size1; //No. of nodes in graph
     map<int, double> pagerank; //adjacency list define krte hue
     //vector<double> ranks; //iske saath work krenge
     bool converged = false; //p<0.001 ko check krne ke liye
 
-    for(int i=0;i<sz;i++) pagerank[i]= double(1)/double(sz); //Initial probability sabko same derahe
-
-    // is it necessary? me not sure
-    //for(int i=0;i<sz;i++){
-    //    pagerank[i].push_back(i);
-    //    for(auto x:adj[i]) pagerank[i].push_back(x);
-    //}
-    //
+    for(int i=0;i<sz;i++) {pagerank[i]= double(double(1)/double(sz));} //Initial probability sabko same derahe
 
     while(!converged){
         map<int, double> ranks_cpy;
-        for(int i=0;i<sz;i++) ranks_cpy[i] = pagerank[i]; // ranks ko hi copy kiya
+        for(int i=0;i<sz;i++) {ranks_cpy[i] = pagerank[i];}// ranks ko hi copy kiya
         map<int,double> ranks_diff; //threshold(0.001) maintain/check krne ke liye
 
         for(int i=0;i<sz;i++){
             double prb =0; //probability
             //int l=0; //calculating no. of links from one site to others
             for(auto x:adj[i]){
-                if(x.size()!=0) prb += ranks_cpy[i]/x.size();
-                else if(x.size==0) prb+= 1/sz;
+                if(adj[i].size()!=0) prb += double(ranks_cpy[i])/adj[i].size();
+                else if(adj[i].size()==0) prb+= double(1)/sz;
             }
             // Be cautious. CHECK
             pagerank[i] = double(1-damping_factor)/sz + double(damping_factor*prb);
             ranks_diff[i] = abs(ranks_cpy[i]-pagerank[i]);
+            cout<<ranks_diff[i]<<endl;
 
         }
         converged = true;
@@ -203,5 +197,19 @@ vector<double> iterate_Meth2(vector<int> adj[], double damping_factor){
 
 int main()
 {
+    vector<int> c1[4];
+    c1[0].push_back(1);
+    c1[1].push_back(0);
+    c1[1].push_back(2);
+    c1[2].push_back(1);
+    c1[2].push_back(3);
+    c1[3].push_back(1);
+    map<int,double> ans;
+    ans = iterate_Meth2(c1,0.85,4);
+    for(auto x:ans){
+        cout<<x.first<<" "<<x.second<<endl;
+    }
+    vector<double> ans2 = random_surfer_walk(c1, 0.85, 10000, 4);
+    for(auto)
   return 0;
 }
